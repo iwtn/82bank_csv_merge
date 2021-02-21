@@ -27,8 +27,15 @@ end
 
 CSV.open("csv/#{OUTPUT_FILENAME}", 'w') do |csv|
   csv << %w(id 取引日 収入 支出 明細 残高)
+  before_balance = nil
   row_hash.keys.sort.each do |key|
     row = row_hash[key]
+
+    if !before_balance.nil? && (before_balance - row[:out_amount].to_i + row[:in_amount].to_i != row[:balance])
+      csv << ['empty']
+    end
+
     csv << [key, row[:date], row[:out_amount], row[:in_amount], row[:detail], row[:balance]]
+    before_balance = row[:balance]
   end
 end
